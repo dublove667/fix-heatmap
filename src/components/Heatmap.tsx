@@ -74,19 +74,15 @@ export default function Heatmap({
             treemap.paddingTop(0).paddingInner(1)
         } else {
             // Desktop: Reserve space for headers based on node type
+            // Index: 20px, Sector: 19px (1px gap for 18px header)
             treemap.paddingTop((node) => {
-                if (node.data.type === 'index') return 24
-                if (node.data.type === 'sector') return 20
+                if (node.data.type === 'index') return 20
+                if (node.data.type === 'sector') return 19
                 return 0
-            }).paddingInner(1)
+            }).paddingInner(2) // Increase inner padding for better separation
         }
 
         treemap(root)
-
-        console.log('After treemap - last 5 stocks: ')
-        root.leaves().slice(-5).forEach((leaf: any) => {
-            console.log(`${leaf.data.data?.ticker}:`, { y0: leaf.y0, y1: leaf.y1 })
-        })
 
         layoutRef.current = []
 
@@ -142,9 +138,9 @@ export default function Heatmap({
                 ctx.lineWidth = 1
                 ctx.strokeRect(x0, y0, width, height)
 
-                if (width > 40 && height > 20) {
+                if (width > 40 && height > 18) {
                     ctx.fillStyle = '#ffffff'
-                    ctx.font = 'bold 12px "JetBrains Mono", monospace'
+                    ctx.font = 'bold 10px "JetBrains Mono", monospace'
                     ctx.textAlign = 'center'
                     ctx.textBaseline = 'middle'
                     ctx.fillText(label, x0 + width / 2, y0 + height / 2)
@@ -164,14 +160,14 @@ export default function Heatmap({
                 if (node.data.type === 'index') {
                     const { x0, y0, x1 } = node
                     const width = x1 - x0
-                    const height = 24
+                    const height = 20
 
                     ctx.fillStyle = '#475569'
                     ctx.fillRect(x0, y0, width, height)
 
                     if (width > 60) {
                         ctx.fillStyle = '#f8fafc'
-                        ctx.font = 'bold 12px "JetBrains Mono", monospace'
+                        ctx.font = 'bold 10px "JetBrains Mono", monospace'
                         ctx.textAlign = 'left'
                         ctx.textBaseline = 'middle'
                         ctx.fillText(node.data.name, x0 + 6, y0 + height / 2)
@@ -196,13 +192,35 @@ export default function Heatmap({
                 if (node.data.type === 'sector') {
                     const { x0, y0, x1 } = node
                     const width = x1 - x0
-                    const height = 20
+                    const height = 18
 
                     if (width > 50) {
-                        ctx.fillStyle = '#64748b'
+                        // Calculate weighted average change for the sector
+                        const leaves = node.leaves()
+                        const totalValue = leaves.reduce((sum: number, leaf: any) => sum + (leaf.data.value || 0), 0)
+                        const weightedChange = leaves.reduce((sum: number, leaf: any) => {
+                            return sum + (leaf.data.data?.change || 0) * (leaf.data.value || 0)
+                        }, 0)
+                        const avgChange = totalValue ? weightedChange / totalValue : 0
+
+                        // Apply color based on change and colorBlindMode
+                        if (colorBlindMode) {
+                            if (avgChange > 0) {
+                                ctx.fillStyle = 'rgba(59, 130, 246, 0.7)' // Blue
+                            } else {
+                                ctx.fillStyle = 'rgba(249, 115, 22, 0.7)' // Orange
+                            }
+                        } else {
+                            if (avgChange > 0) {
+                                ctx.fillStyle = 'rgba(34, 197, 94, 0.7)' // Green
+                            } else {
+                                ctx.fillStyle = 'rgba(239, 68, 68, 0.7)' // Red
+                            }
+                        }
+
                         ctx.fillRect(x0, y0, width, height)
 
-                        ctx.fillStyle = '#f1f5f9'
+                        ctx.fillStyle = '#ffffff' // White text for better contrast on colored bg
                         ctx.font = 'bold 10px "JetBrains Mono", monospace'
                         ctx.textAlign = 'left'
                         ctx.textBaseline = 'middle'
@@ -240,7 +258,7 @@ export default function Heatmap({
                 ctx.fillStyle = getColor(stock.change)
                 ctx.fillRect(x0, y0, width, height)
 
-                if (width > 30 && height > 20) {
+                if (width > 30 && height > 18) {
                     ctx.fillStyle = '#ffffff'
                     ctx.font = 'bold 10px "JetBrains Mono", monospace'
                     ctx.textAlign = 'center'
@@ -287,12 +305,17 @@ export default function Heatmap({
     }
 
     return (
-        <div
-            ref={containerRef}
-            onClick={handleClick}
-            className="w-full h-full bg-slate-950 overflow-hidden touch-none cursor-pointer"
-        >
-            <canvas ref={canvasRef} />
+        <div className="w-full h-full overflow-y-auto bg-slate-950">
+            <div
+                ref={containerRef}
+                onClick={handleClick}
+                className="w-full h-full cursor-pointer px-4 md:p-6"
+            >
+                <canvas ref={canvasRef} />
+            </div>
+            <div className="w-full h-[280px] flex items-center justify-center text-slate-500 font-bold text-2xl pb-10">
+                dublove
+            </div>
         </div>
     )
 }
