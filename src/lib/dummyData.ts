@@ -7,6 +7,11 @@ export interface Stock {
     price: number
     change: number
     value: number
+    history: {
+        daily: { date: string, value: number, label: string, isToday?: boolean }[]
+        weekly: { date: string, value: number, label: string }[]
+        quarterly: { date: string, value: number, label: string }[]
+    }
 }
 
 export interface TreeMapNode {
@@ -34,6 +39,59 @@ export function generateDummyData(): TreeMapNode {
     const children: TreeMapNode[] = []
     let stockIdCounter = 0
 
+    // Helper to generate history
+    const generateHistory = (baseValue: number) => {
+        const daily = []
+        const weekly = []
+        const quarterly = []
+
+        // 1 Week (Daily) - M T W T F
+        const days = ['M', 'T', 'W', 'T', 'F']
+        // Simulate "Today" is random between 0-4 (Mon-Fri) or just fixed for demo
+        // Let's assume today is Friday for full data, or random to show "future hidden"
+        // For consistent demo, let's say today is Thursday (index 3)
+        const todayIndex = 3
+
+        let currentValue = baseValue
+
+        for (let i = 0; i < 5; i++) {
+            const change = (Math.random() * 4) - 2 // -2% to +2%
+            currentValue = currentValue * (1 + change / 100)
+
+            // Only add data if it's today or before
+            if (i <= todayIndex) {
+                daily.push({
+                    date: `2024-11-${25 + i}`,
+                    value: change, // Store percentage change for the bar chart
+                    label: days[i],
+                    isToday: i === todayIndex
+                })
+            }
+        }
+
+        // 1 Month (Weekly) - 4 Weeks
+        for (let i = 0; i < 4; i++) {
+            const change = (Math.random() * 10) - 5
+            weekly.push({
+                date: `Week ${i + 1}`,
+                value: change,
+                label: `W${i + 1}`
+            })
+        }
+
+        // 1 Year (Quarterly) - 4 Quarters
+        for (let i = 0; i < 4; i++) {
+            const change = (Math.random() * 20) - 10
+            quarterly.push({
+                date: `Q${i + 1}`,
+                value: change,
+                label: `Q${i + 1}`
+            })
+        }
+
+        return { daily, weekly, quarterly }
+    }
+
     // Generate stocks for each index with fixed counts
     for (const indexConfig of INDEX_CONFIGS) {
         const indexStocks: Stock[] = []
@@ -52,7 +110,8 @@ export function generateDummyData(): TreeMapNode {
                 index: indexConfig.name,
                 price: Math.random() * 1000,
                 change,
-                value: baseValue
+                value: baseValue,
+                history: generateHistory(baseValue)
             })
 
             stockIdCounter++
@@ -92,16 +151,6 @@ export function generateDummyData(): TreeMapNode {
         name: 'Market',
         children
     }
-
-    console.log('=== DUMMY DATA DEBUG ===')
-    console.log('Total indices:', children.length)
-    children.forEach(index => {
-        const stockCount = index.children?.reduce((sum, sector) => sum + (sector.children?.length || 0), 0) || 0
-        console.log(`${index.name}: ${stockCount} stocks, value: ${index.value}`)
-    })
-    console.log('Total stocks:', children.reduce((sum, idx) =>
-        sum + (idx.children?.reduce((s, sec) => s + (sec.children?.length || 0), 0) || 0), 0))
-    console.log('========================')
 
     return result
 }

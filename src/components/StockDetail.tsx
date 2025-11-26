@@ -1,13 +1,7 @@
 'use client'
 
-import {
-    Drawer,
-    DrawerContent,
-    DrawerDescription,
-    DrawerHeader,
-    DrawerTitle,
-} from "@/components/ui/drawer"
 import { Stock } from "@/lib/dummyData"
+import BottomSheet from "./BottomSheet"
 
 interface StockDetailProps {
     stock: Stock | null
@@ -22,49 +16,44 @@ export default function StockDetail({ stock, isOpen, onClose }: StockDetailProps
     const colorClass = isPositive ? 'text-green-500' : 'text-red-500'
 
     return (
-        <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DrawerContent className="bg-slate-900 border-slate-800 text-white rounded-t-[20px]">
-                <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-slate-700 mt-4 mb-2" />
-                <DrawerHeader className="text-left">
-                    <DrawerTitle className="text-2xl font-bold text-white flex items-center gap-2">
-                        {stock.ticker}
-                        <span className="text-sm font-normal text-slate-400">{stock.name}</span>
-                    </DrawerTitle>
-                    <DrawerDescription className="text-slate-400">
-                        {stock.sector}
-                    </DrawerDescription>
-                </DrawerHeader>
+        <BottomSheet
+            isOpen={isOpen}
+            onClose={onClose}
+            title={`${stock.ticker} - ${stock.name}`}
+        >
+            <div className="text-sm text-slate-400 mb-4 px-2">
+                {stock.sector}
+            </div>
 
-                <div className="p-4 grid grid-cols-2 gap-4 pb-10">
-                    <div className="p-4 rounded-lg bg-slate-800">
-                        <div className="text-sm text-slate-400">Price</div>
-                        <div className="text-2xl font-mono font-bold">
-                            ${stock.price.toFixed(2)}
-                        </div>
-                    </div>
-
-                    <div className="p-4 rounded-lg bg-slate-800">
-                        <div className="text-sm text-slate-400">Change</div>
-                        <div className={`text-2xl font-mono font-bold ${colorClass}`}>
-                            {isPositive ? '+' : ''}{stock.change.toFixed(2)}%
-                        </div>
-                    </div>
-
-                    <div className="p-4 rounded-lg bg-slate-800">
-                        <div className="text-sm text-slate-400">Market Cap</div>
-                        <div className="text-xl font-mono">
-                            ${(stock.value / 1e9).toFixed(2)}B
-                        </div>
-                    </div>
-
-                    <div className="p-4 rounded-lg bg-slate-800">
-                        <div className="text-sm text-slate-400">Volume (24h)</div>
-                        <div className="text-xl font-mono">
-                            {(Math.random() * 100).toFixed(1)}M
-                        </div>
+            <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 rounded-lg bg-slate-800">
+                    <div className="text-sm text-slate-400">Price</div>
+                    <div className="text-2xl font-mono font-bold text-white">
+                        ${stock.price.toFixed(2)}
                     </div>
                 </div>
-            </DrawerContent>
-        </Drawer>
+
+                <div className="p-4 rounded-lg bg-slate-800">
+                    <div className="text-sm text-slate-400">Change</div>
+                    <div className={`text-2xl font-mono font-bold ${colorClass}`}>
+                        {isPositive ? '+' : ''}{stock.change.toFixed(2)}%
+                    </div>
+                </div>
+
+                <div className="p-4 rounded-lg bg-slate-800">
+                    <div className="text-sm text-slate-400">Market Cap</div>
+                    <div className="text-xl font-mono text-white">
+                        ${(stock.value / 1e9).toFixed(2)}B
+                    </div>
+                </div>
+
+                <div className="p-4 rounded-lg bg-slate-800">
+                    <div className="text-sm text-slate-400">Volume (24h)</div>
+                    <div className="text-xl font-mono text-white">
+                        {(Math.random() * 100).toFixed(1)}M
+                    </div>
+                </div>
+            </div>
+        </BottomSheet>
     )
 }

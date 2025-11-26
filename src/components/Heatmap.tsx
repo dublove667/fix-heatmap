@@ -278,9 +278,9 @@ export default function Heatmap({
     }, [data, dimensions, colorBlindMode, isMobile])
 
     const handleClick = (e: React.MouseEvent) => {
-        if (!containerRef.current) return
+        if (!canvasRef.current) return
 
-        const rect = containerRef.current.getBoundingClientRect()
+        const rect = canvasRef.current.getBoundingClientRect()
         const x = e.clientX - rect.left
         const y = e.clientY - rect.top
 
@@ -305,16 +305,15 @@ export default function Heatmap({
     }
 
     return (
-        <div className="w-full h-full overflow-y-auto bg-slate-950">
+        <div className="w-full h-full flex flex-col overflow-y-auto bg-slate-950">
             <div
                 ref={containerRef}
-                onClick={handleClick}
-                className="w-full h-full cursor-pointer px-4 md:p-6"
+                className="flex-1 w-full cursor-pointer py-4 md:py-6 min-h-[calc(100vh-140px)]"
             >
-                <canvas ref={canvasRef} />
-            </div>
-            <div className="w-full h-[280px] flex items-center justify-center text-slate-500 font-bold text-2xl pb-10">
-                dublove
+                <canvas
+                    ref={canvasRef}
+                    onClick={handleClick}
+                />
             </div>
         </div>
     )
