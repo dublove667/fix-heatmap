@@ -4,6 +4,8 @@ import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Heatmap from '@/components/Heatmap'
 import StockDetail from '@/components/StockDetail'
+import PageHeader from '@/components/PageHeader'
+import ControlBar from '@/components/ControlBar'
 import { generateDummyData, TreeMapNode, Stock } from '@/lib/dummyData'
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
@@ -226,86 +228,73 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col bg-slate-950 text-slate-50">
       {/* Header */}
-      <header className="border-b border-slate-800 bg-slate-950 sticky top-0 z-50 h-16 px-4">
-        <div className="max-w-[1280px] mx-auto h-full flex items-center justify-between">
-          {/* Left: View Toggle (Heatmap/Report) */}
-          <div className="flex items-center gap-2 w-1/3">
-            <button
-              onClick={() => router.push('/report')}
-              className="p-2 hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-white"
-              title="Switch to Report View"
-            >
-              <BarChart3 className="w-6 h-6" />
-            </button>
-          </div>
-
-          {/* Center: Title */}
-          <div className="flex items-center justify-center w-1/3">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent whitespace-nowrap">
-              Stock Heatmap
-            </h1>
-          </div>
-
-          {/* Right: Color Blind Toggle */}
-          <div className="flex items-center justify-end gap-4 w-1/3">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-slate-400 hidden md:inline">Color Blind</span>
-              <Switch
-                checked={colorBlindMode}
-                onCheckedChange={setColorBlindMode}
-              />
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Controls Bar */}
-      <div className="bg-slate-900/50 border-b border-slate-800 px-4">
-        <div className="max-w-[1280px] mx-auto py-3 flex flex-col md:flex-row items-center justify-between gap-4">
-          {/* Search Bar */}
-          <div className="w-full md:w-1/3">
-            <Input
-              placeholder="Search stocks..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-slate-900 border-slate-700 text-white w-full"
+      <PageHeader
+        title="Stock Heatmap"
+        leftContent={
+          <button
+            onClick={() => router.push('/report')}
+            className="p-2 hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-white"
+            title="Switch to Report View"
+          >
+            <BarChart3 className="w-6 h-6" />
+          </button>
+        }
+        rightContent={
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-slate-400 hidden md:inline">Color Blind</span>
+            <Switch
+              checked={colorBlindMode}
+              onCheckedChange={setColorBlindMode}
             />
           </div>
+        }
+      />
 
-          {/* Desktop Filters */}
-          <div className="hidden md:flex items-center gap-4 w-full md:w-auto overflow-x-auto no-scrollbar justify-end">
-            <Select value={selectedIndex} onValueChange={(val) => {
-              setSelectedIndex(val)
-              setSelectedSector('All')
-            }}>
-              <SelectTrigger className="w-[140px] bg-slate-900 border-slate-700">
-                <SelectValue placeholder="Index" />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-900 border-slate-700 text-white">
-                <SelectItem value="All">All Indices</SelectItem>
-                <SelectItem value="S&P 500">S&P 500</SelectItem>
-                <SelectItem value="Nasdaq 100">Nasdaq 100</SelectItem>
-                <SelectItem value="Dow Jones">Dow Jones</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select
-              value={selectedSector}
-              onValueChange={setSelectedSector}
-            >
-              <SelectTrigger className="w-[180px] bg-slate-900 border-slate-700">
-                <SelectValue placeholder="All Sectors" />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-900 border-slate-700 text-white">
-                <SelectItem value="All">All Sectors</SelectItem>
-                {availableSectors.map(sector => (
-                  <SelectItem key={sector} value={sector}>{sector}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+      {/* Controls Bar */}
+      <ControlBar>
+        {/* Search Bar */}
+        <div className="w-full md:w-1/3">
+          <Input
+            placeholder="Search stocks..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="bg-slate-900 border-slate-700 text-white w-full"
+          />
         </div>
-      </div>
+
+        {/* Desktop Filters */}
+        <div className="hidden md:flex items-center gap-4 w-full md:w-auto overflow-x-auto no-scrollbar justify-end">
+          <Select value={selectedIndex} onValueChange={(val) => {
+            setSelectedIndex(val)
+            setSelectedSector('All')
+          }}>
+            <SelectTrigger className="w-[140px] bg-slate-900 border-slate-700">
+              <SelectValue placeholder="Index" />
+            </SelectTrigger>
+            <SelectContent className="bg-slate-900 border-slate-700 text-white">
+              <SelectItem value="All">All Indices</SelectItem>
+              <SelectItem value="S&P 500">S&P 500</SelectItem>
+              <SelectItem value="Nasdaq 100">Nasdaq 100</SelectItem>
+              <SelectItem value="Dow Jones">Dow Jones</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={selectedSector}
+            onValueChange={setSelectedSector}
+          >
+            <SelectTrigger className="w-[180px] bg-slate-900 border-slate-700">
+              <SelectValue placeholder="All Sectors" />
+            </SelectTrigger>
+            <SelectContent className="bg-slate-900 border-slate-700 text-white">
+              <SelectItem value="All">All Sectors</SelectItem>
+              {availableSectors.map(sector => (
+                <SelectItem key={sector} value={sector}>{sector}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </ControlBar>
 
       {/* Breadcrumbs (Mobile Only) */}
       {isMobile && breadcrumbs.length > 0 && (

@@ -47,10 +47,8 @@ export function generateDummyData(): TreeMapNode {
 
         // 1 Week (Daily) - M T W T F
         const days = ['M', 'T', 'W', 'T', 'F']
-        // Simulate "Today" is random between 0-4 (Mon-Fri) or just fixed for demo
-        // Let's assume today is Friday for full data, or random to show "future hidden"
-        // For consistent demo, let's say today is Thursday (index 3)
-        const todayIndex = 3
+        // Set today as Friday (index 4) to show all 5 days
+        const todayIndex = 4
 
         let currentValue = baseValue
 
